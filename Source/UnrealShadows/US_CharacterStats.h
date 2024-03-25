@@ -19,7 +19,7 @@ struct UNREALSHADOWS_API FUS_CharacterStats : public FTableRowBase
 	float DamageMultiplier = 1.0f;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	int32 NextLevelXp = 10.0f;
+	int32 NextLevelXP = 10.0f;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float StealthMultiplier = 1.0f;

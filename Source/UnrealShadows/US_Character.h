@@ -34,6 +34,7 @@ class UNREALSHADOWS_API AUS_Character : public ACharacter
 
 	struct FUS_CharacterStats* CharacterStats;
 
+
 public:
 	// Sets default values for this character's properties
 	AUS_Character();
