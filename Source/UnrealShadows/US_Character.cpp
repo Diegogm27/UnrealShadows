@@ -10,6 +10,8 @@
 #include "GameFramework/Controller.h" 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "US_CharacterStats.h" 
+#include "Engine/DataTable.h"
 
 // Sets default values
 AUS_Character::AUS_Character()
@@ -58,7 +60,7 @@ void AUS_Character::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
-	
+	UpdateCharacterStats(1);
 }
 
 void AUS_Character::Move(const FInputActionValue& Value)
@@ -89,12 +91,18 @@ void AUS_Character::Look(const FInputActionValue& Value)
 
 void AUS_Character::SprintStart(const FInputActionValue& Value)
 {
-	GetCharacterMovement()->MaxWalkSpeed = 3000.f;
+	if (GetCharacterStats())
+	{
+		GetCharacterMovement()->MaxWalkSpeed = GetCharacterStats() -> SprintSpeed;
+	}
 }
 
 void AUS_Character::SprintEnd(const FInputActionValue& Value)
 {
-	GetCharacterMovement()->MaxWalkSpeed = 500.f;
+	if (GetCharacterStats())
+	{
+		GetCharacterMovement()->MaxWalkSpeed = GetCharacterStats() -> WalkSpeed;
+	}
 }
 
 void AUS_Character::Interact(const FInputActionValue& Value)
@@ -121,6 +129,21 @@ void AUS_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &AUS_Character::Interact);
 		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &AUS_Character::SprintStart);
 		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AUS_Character::SprintEnd);
+	}
+}
+
+void AUS_Character::UpdateCharacterStats(int32 CharacterLevel)
+{
+	if (CharacterDataTable)
+	{
+		TArray<FUS_CharacterStats*> CharacterStatsRows;
+		CharacterDataTable->GetAllRows<FUS_CharacterStats>(TEXT("US_Character"), CharacterStatsRows);
+		if (CharacterStatsRows.Num() > 0)
+		{
+			const auto NewCharacterLevel = FMath::Clamp(CharacterLevel, 1, CharacterStatsRows.Num());
+			CharacterStats = CharacterStatsRows[NewCharacterLevel - 1];
+			GetCharacterMovement()->MaxWalkSpeed = GetCharacterStats() -> WalkSpeed;
+		}
 	}
 }
 
