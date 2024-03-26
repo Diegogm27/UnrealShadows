@@ -3,7 +3,7 @@
 
 #include "US_PlayerState.h"
 #include "US_Character.h"
-#include "US_CharacterStats.h" 
+#include "US_CharacterStats.h"
 #include "Net/UnrealNetwork.h"
 
 void AUS_PlayerState::OnRep_XP(int32 OldValue) const
