@@ -91,23 +91,32 @@ void AUS_Character::Look(const FInputActionValue& Value)
 
 void AUS_Character::SprintStart(const FInputActionValue& Value)
 {
-	if (GetCharacterStats())
-	{
-		GetCharacterMovement()->MaxWalkSpeed = GetCharacterStats() -> SprintSpeed;
-	}
+	SprintStart_Server();
 }
 
 void AUS_Character::SprintEnd(const FInputActionValue& Value)
 {
-	if (GetCharacterStats())
-	{
-		GetCharacterMovement()->MaxWalkSpeed = GetCharacterStats() -> WalkSpeed;
-	}
+	SprintEnd_Server();
 }
 
 void AUS_Character::Interact(const FInputActionValue& Value)
 {
 	GEngine->AddOnScreenDebugMessage(3, 5.f, FColor::Red, TEXT("Interact"));
+}
+
+void AUS_Character::SprintStart_Server_Implementation()
+{
+	if (GetCharacterStats())
+	{
+		GetCharacterMovement()->MaxWalkSpeed = GetCharacterStats() -> SprintSpeed;
+	}
+}
+void AUS_Character::SprintEnd_Server_Implementation()
+{
+	if (GetCharacterStats())
+	{
+		GetCharacterMovement()->MaxWalkSpeed = GetCharacterStats() -> WalkSpeed;
+	}
 }
 
 // Called every frame
@@ -134,6 +143,11 @@ void AUS_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 void AUS_Character::UpdateCharacterStats(int32 CharacterLevel)
 {
+	auto IsSprinting = false;
+	if (GetCharacterStats())
+	{
+		IsSprinting = GetCharacterMovement()->MaxWalkSpeed ==GetCharacterStats()->SprintSpeed;
+	}
 	if (CharacterDataTable)
 	{
 		TArray<FUS_CharacterStats*> CharacterStatsRows;
@@ -143,6 +157,10 @@ void AUS_Character::UpdateCharacterStats(int32 CharacterLevel)
 			const auto NewCharacterLevel = FMath::Clamp(CharacterLevel, 1, CharacterStatsRows.Num());
 			CharacterStats = CharacterStatsRows[NewCharacterLevel - 1];
 			GetCharacterMovement()->MaxWalkSpeed = GetCharacterStats() -> WalkSpeed;
+			if (IsSprinting)
+			{
+				SprintStart_Server();
+			}
 		}
 	}
 }
