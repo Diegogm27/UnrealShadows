@@ -32,7 +32,11 @@ class UNREALSHADOWS_API AUS_Character : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Data", meta = (AllowPrivateAccess = "true")) 
 	class UDataTable* CharacterDataTable;
 
+	UPROPERTY()
+	AActor* InteractableActor;
+
 	struct FUS_CharacterStats* CharacterStats;
+
 
 
 public:
@@ -54,6 +58,9 @@ protected:
 	void SprintStart_Server();
 	UFUNCTION(Server, Reliable)
 	void SprintEnd_Server();
+
+	UFUNCTION(Server, Reliable)
+	void Interact_Server();
 
 public:	
 	// Called every frame
