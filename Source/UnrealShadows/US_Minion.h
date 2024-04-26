@@ -20,6 +20,14 @@ class UNREALSHADOWS_API AUS_Minion : public ACharacter
 	UPROPERTY()
 	FVector PatrolLocation;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Minion AI", meta = (AllowPrivateAccess = "true"))
+	float AlertRadius = 6000.0f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Health", meta = (AllowPrivateAccess = "true"))
+	float Health = 5.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Pickup", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class AUS_BasePickup> SpawnedPickup;
+
 public:
 	// Sets default values for this character's properties
 	AUS_Minion();
@@ -36,6 +44,12 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	void OnHearNoise(APawn* PawnInstigator, const FVector& Location, float Volume);
+
+	UFUNCTION()
+	void OnDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
 
 public:	
 	// Called every frame
@@ -60,5 +74,8 @@ public:
 
 	UFUNCTION()
 	void OnBeginOverlap(AActor* OverlappedActor, AActor* OtherActor);
+
+	UFUNCTION(BlueprintCallable, Category = "Minion AI")
+	void GoToLocation(const FVector& Location);
 	
 };

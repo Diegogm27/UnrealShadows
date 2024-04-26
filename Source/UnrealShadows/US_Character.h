@@ -37,6 +37,11 @@ class UNREALSHADOWS_API AUS_Character : public ACharacter
 
 	struct FUS_CharacterStats* CharacterStats;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stealth", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UPawnNoiseEmitterComponent> NoiseEmitter;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UUS_WeaponProjectileComponent> Weapon;
 
 
 public:
@@ -75,4 +80,6 @@ public:
 	FORCEINLINE FUS_CharacterStats* GetCharacterStats() const { return CharacterStats; }
 
 	void UpdateCharacterStats(int32 CharacterLevel);
+
+	FORCEINLINE UUS_WeaponProjectileComponent* GetWeapon() const { return Weapon; }
 };

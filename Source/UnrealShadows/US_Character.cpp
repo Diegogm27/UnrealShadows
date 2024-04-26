@@ -14,6 +14,8 @@
 #include "Engine/DataTable.h"
 #include "US_Interactable.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Components/PawnNoiseEmitterComponent.h"
+#include "US_WeaponProjectileComponent.h"
 
 // Sets default values
 AUS_Character::AUS_Character()
@@ -29,6 +31,13 @@ AUS_Character::AUS_Character()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
+
+	NoiseEmitter = CreateDefaultSubobject<UPawnNoiseEmitterComponent>(TEXT("NoiseEmitter"));
+	NoiseEmitter->NoiseLifetime = 0.01f;
+
+	Weapon = CreateDefaultSubobject<UUS_WeaponProjectileComponent>(TEXT("Weapon"));
+	Weapon->SetupAttachment(RootComponent);
+	Weapon->SetRelativeLocation(FVector(120.f, 70.f, 0.f));
 
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -163,6 +172,16 @@ void AUS_Character::Tick(float DeltaTime)
 	else
 	{
 		InteractableActor = nullptr;
+	}
+
+	if (GetCharacterMovement()->MaxWalkSpeed == GetCharacterStats() -> SprintSpeed)
+	{
+		auto Noise = 1.f;
+		if (GetCharacterStats() && GetCharacterStats()->StealthMultiplier)
+		{
+			Noise = Noise / GetCharacterStats()->StealthMultiplier;
+		}
+		NoiseEmitter->MakeNoise(this, Noise, GetActorLocation());
 	}
 }
 

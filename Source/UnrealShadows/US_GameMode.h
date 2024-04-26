@@ -17,4 +17,6 @@ class UNREALSHADOWS_API AUS_GameMode : public AGameMode
 public:
 	AUS_GameMode();
 	
+	UFUNCTION(BlueprintCallable, Category = "Minions")
+	void AlertMinions(class AActor* AlertInstigator, const FVector& Location, float Radius);
 };
