@@ -63,6 +63,10 @@ protected:
 	void SprintStart_Server();
 	UFUNCTION(Server, Reliable)
 	void SprintEnd_Server();
+	UFUNCTION(NetMulticast, Reliable)
+	void SprintStart_Client();
+	UFUNCTION(NetMulticast, Reliable)
+	void SprintEnd_Client();
 
 	UFUNCTION(Server, Reliable)
 	void Interact_Server();

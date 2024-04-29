@@ -19,6 +19,9 @@ class UNREALSHADOWS_API UUS_WeaponProjectileComponent : public USceneComponent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	class UInputAction* ThrowAction;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Projectile", meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* ThrowAnimation;
+
 public:	
 	// Sets default values for this component's properties
 	UUS_WeaponProjectileComponent();
@@ -33,6 +36,9 @@ protected:
 	void Throw();
 	UFUNCTION(Server, Reliable)
 	void Throw_Server();
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void Throw_Client();
 
 public:	
 	// Called every frame
