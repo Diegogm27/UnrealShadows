@@ -14,4 +14,8 @@ class UNREALSHADOWS_API UUS_GameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 	
+public:
+
+	UPROPERTY(BlueprintReadWrite)
+	int32 SkinIndex;
 };

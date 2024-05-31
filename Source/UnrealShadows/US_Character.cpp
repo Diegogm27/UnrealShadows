@@ -16,6 +16,9 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Components/PawnNoiseEmitterComponent.h"
 #include "US_WeaponProjectileComponent.h"
+#include "US_GameInstance.h" 
+#include "US_CharacterSkins.h" 
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 AUS_Character::AUS_Character()
@@ -73,6 +76,14 @@ void AUS_Character::BeginPlay()
 		}
 	}
 	UpdateCharacterStats(1);
+
+	if (IsLocallyControlled())
+	{
+		if (const auto GameInstanceCast = Cast<UUS_GameInstance>(GetWorld() -> GetGameInstance()); GameInstanceCast != nullptr)
+		{
+			SetSkinIndex_Server(GameInstanceCast->SkinIndex);
+		}
+	}
 }
 
 void AUS_Character::Move(const FInputActionValue& Value)
@@ -146,6 +157,35 @@ void AUS_Character::Interact_Server_Implementation()
 	if (InteractableActor)
 	{
 		IUS_Interactable::Execute_Interact(InteractableActor, this);
+	}
+}
+
+void AUS_Character::OnRep_SkinChanged(int32 OldValue)
+{
+	UpdateCharacterSkin();
+}
+
+void AUS_Character::SetSkinIndex_Server_Implementation(int32 Value)
+{
+	SkinIndex = Value;
+	UpdateCharacterSkin();
+}
+
+void AUS_Character::UpdateCharacterSkin()
+{
+	if (CharacterSkinDataTable)
+	{
+		TArray<FUS_CharacterSkins*> CharacterSkinsRows;
+		CharacterSkinDataTable->GetAllRows<FUS_CharacterSkins>(TEXT("US_Character"), CharacterSkinsRows);
+		if (CharacterSkinsRows.Num() > 0)
+		{
+			const auto Index = FMath::Clamp(SkinIndex, 0, CharacterSkinsRows.Num() - 1);
+			CharacterSkin = CharacterSkinsRows[Index];
+			GetMesh()->SetMaterial(4, CharacterSkin->Material4);
+			GetMesh()->SetMaterial(0, CharacterSkin->Material0);
+			GetMesh()->SetMaterial(1, CharacterSkin->Material1);
+			GetMesh()->SetMaterial(2, CharacterSkin->Material2);
+		}
 	}
 }
 
@@ -233,5 +273,12 @@ void AUS_Character::UpdateCharacterStats(int32 CharacterLevel)
 			}
 		}
 	}
+}
+
+void AUS_Character::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AUS_Character, SkinIndex);
 }
 

@@ -43,6 +43,11 @@ class UNREALSHADOWS_API AUS_Character : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UUS_WeaponProjectileComponent> Weapon;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Data", meta = (AllowPrivateAccess = "true"))
+	UDataTable * CharacterSkinDataTable;
+
+	struct FUS_CharacterSkins* CharacterSkin;
+
 
 public:
 	// Sets default values for this character's properties
@@ -71,6 +76,15 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void Interact_Server();
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, ReplicatedUsing = "OnRep_SkinChanged", Category = "Skin")
+	int32 SkinIndex = 0;
+	UFUNCTION()
+	void OnRep_SkinChanged(int32 OldValue);
+	UFUNCTION(Server, Reliable)
+	void SetSkinIndex_Server(int32 Value);
+	UFUNCTION()
+	void UpdateCharacterSkin();
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -86,4 +100,7 @@ public:
 	void UpdateCharacterStats(int32 CharacterLevel);
 
 	FORCEINLINE UUS_WeaponProjectileComponent* GetWeapon() const { return Weapon; }
+
+	FORCEINLINE FUS_CharacterSkins* GetCharacterSkins() const { return CharacterSkin; }
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&OutLifetimeProps) const override;
 };
